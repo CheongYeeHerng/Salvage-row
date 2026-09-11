@@ -44,6 +44,10 @@ export async function POST(req: NextRequest) {
     maxTokens: 1024,
   });
 
+  if (!result.ok && result.error) {
+    console.error("[search] gateway call failed:", result.error);
+  }
+
   if (result.ok) {
     const parsed = parseJsonLoose<SearchModelResponse>(result.text);
     if (parsed && Array.isArray(parsed.results)) {

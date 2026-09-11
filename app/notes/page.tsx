@@ -95,13 +95,23 @@ export default function NotesPage() {
 
       <Section title="How the AI calls are wired up">
         <p>
-          Both routes call the Claude API from Next.js server routes (<code>app/api/search</code> and{" "}
-          <code>app/api/qa</code>), using an API key read from the server environment
-          (<code>ANTHROPIC_API_KEY</code>). The key is never sent to the browser, never appears in
+          Both routes call a Claude model from Next.js server routes (<code>app/api/search</code>{" "}
+          and <code>app/api/qa</code>) using a key read from the server environment
+          (<code>GATEWAY_API_KEY</code>). The key is never sent to the browser, never appears in
           client bundles, and isn&apos;t committed anywhere in this repository — the deployed
           instance has it set as a hosting-provider environment variable. Reviewers don&apos;t need a
           key of their own to try Search or Ask; every request is proxied through this
           server-side route.
+        </p>
+        <p>
+          One detail specific to this environment: requests don&apos;t go to Anthropic&apos;s API
+          directly. They&apos;re deployed behind a class-provided gateway whose direct Claude
+          routes are blocked for student keys, so the app reaches a Claude model through that
+          same gateway&apos;s OpenRouter-compatible endpoint instead, using OpenAI-style chat
+          completions request and response shapes rather than the native Anthropic Messages API
+          format. Functionally it&apos;s the same thing from the app&apos;s point of view — a
+          server-side call to a Claude model, key never exposed to the client — just routed
+          through a different upstream than a direct Anthropic API integration would use.
         </p>
       </Section>
 

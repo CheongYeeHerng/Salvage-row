@@ -1,5 +1,15 @@
-const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-const MODEL = "claude-sonnet-5";
+/**
+ * This app is deployed behind a class-provided gateway that does not expose
+ * the Anthropic Messages API directly (Claude routes on the gateway itself
+ * return 403 for student keys). The supported path to a Claude model is the
+ * gateway's OpenRouter-compatible endpoint, using OpenAI-style chat
+ * completions request/response shapes. See /notes for details.
+ */
+const GATEWAY_BASE_URL =
+  process.env.GATEWAY_BASE_URL?.replace(/\/+$/, "") ??
+  "https://174.138.16.223/openrouter/v1";
+const CHAT_COMPLETIONS_URL = `${GATEWAY_BASE_URL}/chat/completions`;
+const MODEL = process.env.GATEWAY_MODEL ?? "anthropic/claude-3.5-sonnet";
 
 interface ClaudeCallOptions {
   system: string;
@@ -16,9 +26,10 @@ export interface ClaudeResult {
 }
 
 /**
- * Calls the Anthropic Messages API from the server only. ANTHROPIC_API_KEY is
- * read from the server environment and never sent to the browser. If the key
- * is missing or the call fails, callers should catch `usedFallback: true` and
+ * Calls a Claude model through the gateway's OpenRouter-compatible chat
+ * completions endpoint, from the server only. The gateway key is read from
+ * the server environment and never sent to the browser. If the key is
+ * missing or the call fails, callers should catch `usedFallback: true` and
  * use their own non-AI fallback so the demo still functions.
  */
 export async function callClaude({
@@ -26,30 +37,32 @@ export async function callClaude({
   user,
   maxTokens = 1024,
 }: ClaudeCallOptions): Promise<ClaudeResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GATEWAY_API_KEY ?? process.env.ANTHROPIC_API_KEY;
 
   if (!apiKey) {
     return {
       ok: false,
       text: "",
       usedFallback: true,
-      error: "ANTHROPIC_API_KEY is not configured on the server.",
+      error:
+        "No gateway key configured on the server (checked GATEWAY_API_KEY and ANTHROPIC_API_KEY).",
     };
   }
 
   try {
-    const response = await fetch(ANTHROPIC_URL, {
+    const response = await fetch(CHAT_COMPLETIONS_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: maxTokens,
-        system,
-        messages: [{ role: "user", content: user }],
+        messages: [
+          { role: "system", content: system },
+          { role: "user", content: user },
+        ],
       }),
     });
 
@@ -59,24 +72,32 @@ export async function callClaude({
         ok: false,
         text: "",
         usedFallback: true,
-        error: `Claude API returned ${response.status}: ${errText.slice(0, 300)}`,
+        error: `Gateway returned ${response.status} from ${CHAT_COMPLETIONS_URL}: ${errText.slice(0, 400)}`,
       };
     }
 
     const data = await response.json();
-    const text = (data.content ?? [])
-      .filter((block: { type: string }) => block.type === "text")
-      .map((block: { text: string }) => block.text)
-      .join("\n")
-      .trim();
+    const text: string = data?.choices?.[0]?.message?.content ?? "";
 
-    return { ok: true, text, usedFallback: false };
+    if (!text) {
+      return {
+        ok: false,
+        text: "",
+        usedFallback: true,
+        error: `Gateway responded 200 but no message content was found. Raw shape: ${JSON.stringify(data).slice(0, 400)}`,
+      };
+    }
+
+    return { ok: true, text: text.trim(), usedFallback: false };
   } catch (err) {
     return {
       ok: false,
       text: "",
       usedFallback: true,
-      error: err instanceof Error ? err.message : "Unknown error calling Claude API.",
+      error:
+        err instanceof Error
+          ? `Network/fetch error calling gateway: ${err.message}`
+          : "Unknown error calling the gateway.",
     };
   }
 }

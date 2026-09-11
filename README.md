@@ -63,9 +63,11 @@ Open <http://localhost:3000>.
 
 | Variable            | Required | Description                                                                 |
 | -------------------- | -------- | ----------------------------------------------------------------------------- |
-| `ANTHROPIC_API_KEY`  | No*      | Server-side only. Enables live Claude responses for search and Q&A. Never read in client code, never prefixed with `NEXT_PUBLIC_`. |
+| `GATEWAY_API_KEY`    | No*      | Server-side only. Your class gateway key (`cg_...`). Enables live Claude responses for search and Q&A via the gateway's OpenRouter-compatible endpoint. Never read in client code. `ANTHROPIC_API_KEY` also works as a fallback name if that's what you already set. |
+| `GATEWAY_BASE_URL`   | No       | Overrides the gateway's OpenRouter base URL if it differs from the default (`https://174.138.16.223/openrouter/v1`). |
+| `GATEWAY_MODEL`      | No       | Overrides the Claude model id requested through OpenRouter if the default (`anthropic/claude-3.5-sonnet`) isn't available on your gateway. |
 
-\* Without it, search falls back to keyword matching and Q&A reports itself unavailable —
+\* Without a key, search falls back to keyword matching and Q&A reports itself unavailable —
 both degrade gracefully rather than erroring.
 
 ## Deployment

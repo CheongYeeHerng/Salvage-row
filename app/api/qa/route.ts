@@ -36,6 +36,10 @@ export async function POST(req: NextRequest) {
     maxTokens: 600,
   });
 
+  if (!result.ok && result.error) {
+    console.error("[qa] gateway call failed:", result.error);
+  }
+
   if (result.ok && result.text) {
     return NextResponse.json({ mode: "ai", answer: result.text });
   }
