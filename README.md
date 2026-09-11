@@ -1,56 +1,129 @@
-# Salvage Row — secondhand marketplace demo
+# Salvage Row
 
-A seeded secondhand marketplace built with Next.js 14 (App Router) + TypeScript + Tailwind CSS.
-Mobile-friendly browse and item-detail views, natural-language catalogue search, and a
-catalogue-grounded Q&A assistant — both backed by the Claude API through server-side routes.
-No sign-in is required anywhere on the site. See `/notes` (also at `app/notes/page.tsx`) for
-a full write-up of the design and implementation decisions.
+A seeded secondhand marketplace demo with natural-language catalogue search and a
+catalogue-grounded Q&A assistant, both powered by the Claude API. Built with Next.js 14
+(App Router), TypeScript, and Tailwind CSS. No sign-in required anywhere on the site.
 
-## Requirements
+**[Read `/notes`](./app/notes/page.tsx)** for a full, plain-English write-up of the design
+and implementation decisions — also live at `/notes` on the deployed site.
 
-- Node.js 18.18+ (or 20+)
-- An Anthropic API key, only needed for the AI-backed search/Q&A features to return live
-  model responses (the site still runs and browses fine without one — search falls back to
-  keyword matching, and Q&A reports the feature as unavailable).
+---
 
-## Local development
+## Contents
+
+- [Features](#features)
+- [Tech stack](#tech-stack)
+- [Getting started](#getting-started)
+- [Environment variables](#environment-variables)
+- [Deployment](#deployment)
+- [Project structure](#project-structure)
+- [How search and Q&A work](#how-search-and-qa-work)
+- [What's real vs. simulated](#whats-real-vs-simulated)
+- [Known limitations](#known-limitations)
+
+## Features
+
+- **Browse & item detail** — a responsive listings grid and a detail view for each item,
+  usable on mobile without any account.
+- **Natural-language search** — describe what you want in plain English ("something for a
+  first apartment under $50") and get ranked, relevant listings back.
+- **Catalogue Q&A** — ask questions about the catalogue, including comparisons across items;
+  the assistant answers only from listed data and says so when a fact isn't on file.
+- **Report a listing** — flag wrong information or a suspected scam from any item page.
+- **Simulated checkout** — a clearly labeled, no-op "Buy" flow (no real payments, per the
+  brief).
+
+## Tech stack
+
+| Layer      | Choice                                   |
+| ---------- | ----------------------------------------- |
+| Framework  | Next.js 14 (App Router), TypeScript       |
+| Styling    | Tailwind CSS                              |
+| AI model   | Claude API, called server-side only       |
+| Data       | Static seed catalogue (`data/catalogue.ts`) — no database |
+| Hosting    | Any Node host; tested against Vercel      |
+
+## Getting started
+
+**Requirements:** Node.js 18.18+ (or 20+), and an [Anthropic API key](https://console.anthropic.com/)
+if you want live AI responses from search and Q&A (the site still runs and browses fine
+without one — see [What's real vs. simulated](#whats-real-vs-simulated)).
 
 ```bash
+git clone <this-repo-url>
+cd salvage-row
 npm install
-cp .env.example .env.local   # then paste your key into .env.local (on Windows: copy instead of cp)
+cp .env.example .env.local   # Windows: copy .env.example .env.local
 npm run dev
 ```
 
-Visit http://localhost:3000.
+Open <http://localhost:3000>.
 
-## Deploying (e.g. Vercel)
+## Environment variables
 
-1. Push this project to a Git repo and import it in Vercel (or run `vercel` from this
-   directory).
-2. In the project's environment variables settings, add `ANTHROPIC_API_KEY` with your key.
-   Do **not** add an `NEXT_PUBLIC_`-prefixed version of it — that would ship it to the
-   browser. It should only ever be read inside `app/api/*/route.ts`, which run server-side.
-3. Deploy. `/`, `/item/[id]`, and `/notes` are all public routes with no auth.
+| Variable            | Required | Description                                                                 |
+| -------------------- | -------- | ----------------------------------------------------------------------------- |
+| `ANTHROPIC_API_KEY`  | No*      | Server-side only. Enables live Claude responses for search and Q&A. Never read in client code, never prefixed with `NEXT_PUBLIC_`. |
+
+\* Without it, search falls back to keyword matching and Q&A reports itself unavailable —
+both degrade gracefully rather than erroring.
+
+## Deployment
+
+Deploys like any standard Next.js app:
+
+1. Push to a Git repository and import the project in [Vercel](https://vercel.com) (or run
+   `npx vercel` from this directory).
+2. In the project's **Environment Variables** settings, add `ANTHROPIC_API_KEY`. Do not
+   expose it to the client — it should only ever be read inside `app/api/*/route.ts`.
+3. Deploy. `/`, `/item/[id]`, `/notes`, and the API routes are all public with no auth.
 
 ## Project structure
 
 ```
 app/
-  page.tsx              browse view (search + category filters + grid)
-  item/[id]/page.tsx     item detail view
-  notes/page.tsx         public write-up of decisions and known gaps
-  api/search/route.ts    natural-language search (Claude, with keyword fallback)
-  api/qa/route.ts        catalogue Q&A (Claude)
-components/              UI components (client components where interactive)
-data/catalogue.ts        seed data — 24 listings, mostly single/unique items, some fields
-                          intentionally left unknown (brand, era, original price, tested status)
-lib/anthropic.ts         server-only Claude API helper (key never reaches the client)
-lib/search.ts            shared prompt-context builder + keyword fallback
+  page.tsx                browse view — search box, category filters, listings grid
+  item/[id]/page.tsx       item detail view
+  notes/page.tsx           public write-up of decisions and known gaps
+  api/
+    search/route.ts        natural-language search (Claude, with keyword fallback)
+    qa/route.ts             catalogue Q&A (Claude)
+    report/route.ts         listing report submission (server-validated, logged)
+components/                UI components (client components where interactive)
+data/catalogue.ts          seed data — 24 listings, mostly unique single items, with
+                            some fields intentionally left unknown (brand, era, original
+                            price, tested/verified-working status)
+lib/
+  anthropic.ts              server-only Claude API helper — key never reaches the client
+  search.ts                 shared prompt-context builder + keyword fallback
 ```
+
+## How search and Q&A work
+
+Both features send the entire catalogue (small enough to fit comfortably in context) to
+Claude as JSON alongside the user's query or question, and ask for a grounded response —
+ranked listing IDs for search, a direct answer for Q&A. There's no embeddings pipeline or
+vector database; it's the simplest approach that works at this catalogue size, with the
+trade-offs of that choice (cost, latency, and scale) explained in detail in `/notes`.
+
+Fields the seller hasn't logged (brand, era, original price, tested status) are stored as
+`null`, and both prompts are explicitly instructed to say so rather than guess — this is
+exercised deliberately by several seeded listings.
 
 ## What's real vs. simulated
 
-- Real: browsing, item detail, natural-language search, catalogue Q&A (all call the live
-  Claude API server-side).
-- Simulated, and labeled as such in the UI: checkout/payment on the item page. There are no
-  user accounts, cart persistence, or shipping/logistics — out of scope per the brief.
+| Feature                      | Status                                                        |
+| ------------------------------ | --------------------------------------------------------------- |
+| Browsing, item detail          | Real                                                           |
+| Natural-language search        | Real — live Claude API call, with a keyword fallback           |
+| Catalogue Q&A                  | Real — live Claude API call                                    |
+| Listing reports                | Real API call, validated and logged server-side — not reviewed by anyone |
+| Checkout / payment             | Simulated — a confirmation UI only, no real payment processed  |
+| Accounts / auth                | None, by design — the whole site is public                     |
+
+## Known limitations
+
+See the ["What's unfinished or out of scope"](./app/notes/page.tsx) section of `/notes` for
+the full list, including: no pagination past 12 search results, no rate limiting or caching
+on the API routes, prompts aren't hardened against adversarial queries, and reports aren't
+routed to any real moderation workflow.
