@@ -123,6 +123,13 @@ export default function NotesPage() {
           <li>Search and Q&amp;A prompts are not adversarially hardened against prompt injection via a crafted query.</li>
           <li>Illustrations are simple SVG icons per category, not per-listing photography.</li>
           <li>No offer/negotiation flow — every listing is a fixed, simulated buy-now price.</li>
+          <li>
+            The &quot;Report wrong info or a scam&quot; button on each item page submits to a real
+            API route, which validates and logs the report server-side — but nothing reads that
+            log. There's no moderation queue, no seller suspension logic, and no notification to
+            anyone. A real version would need a review workflow and a way to act on repeated
+            reports against the same seller.
+          </li>
         </ul>
       </Section>
     </div>

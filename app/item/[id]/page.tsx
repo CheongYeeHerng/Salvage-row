@@ -3,6 +3,7 @@ import Link from "next/link";
 import { catalogue, getItem } from "@/data/catalogue";
 import ItemIllustration from "@/components/ItemIllustration";
 import SimulatedPurchase from "@/components/SimulatedPurchase";
+import ReportButton from "@/components/ReportButton";
 
 export function generateStaticParams() {
   return catalogue.map((p) => ({ id: p.id }));
@@ -61,6 +62,10 @@ export default function ItemPage({ params }: { params: { id: string } }) {
           </dl>
 
           <SimulatedPurchase name={item.name} price={item.price} />
+
+          <div className="mt-4">
+            <ReportButton itemId={item.id} />
+          </div>
         </div>
       </div>
     </div>
