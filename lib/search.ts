@@ -15,6 +15,7 @@ export function catalogueContext(): string {
     material: p.material ?? null,
     stock: p.stock,
     seller: p.seller,
+    listedAt: p.listedAt,
     description: p.description,
   }));
   return JSON.stringify(compact, null, 0);

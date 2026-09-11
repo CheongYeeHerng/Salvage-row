@@ -24,8 +24,9 @@ and implementation decisions — also live at `/notes` on the deployed site.
 
 ## Features
 
-- **Browse & item detail** — a responsive listings grid and a detail view for each item,
-  usable on mobile without any account.
+- **Browse & item detail** — a responsive listings grid across two paginated pages (48
+  listings, 24 per page), with sort by newest/oldest or price, and a detail view for each
+  item, usable on mobile without any account.
 - **Natural-language search** — describe what you want in plain English ("something for a
   first apartment under $50") and get ranked, relevant listings back.
 - **Catalogue Q&A** — ask questions about the catalogue, including comparisons across items;
@@ -93,7 +94,7 @@ app/
     qa/route.ts             catalogue Q&A (gateway model)
     report/route.ts         listing report submission (server-validated, logged)
 components/                UI components (client components where interactive)
-data/catalogue.ts          seed data — 24 listings, mostly unique single items, with
+data/catalogue.ts          seed data — 48 listings, mostly unique single items, with
                             some fields intentionally left unknown (brand, era, original
                             price, tested/verified-working status)
 lib/

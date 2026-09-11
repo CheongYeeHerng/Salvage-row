@@ -13,10 +13,17 @@ export default function ItemPage({ params }: { params: { id: string } }) {
   const item = getItem(params.id);
   if (!item) notFound();
 
+  const listedDate = new Date(item.listedAt + "T00:00:00").toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+
   const facts: [string, string][] = [
     ["Price", `$${item.price}`],
     ["Category", item.category],
     ["Condition", item.condition],
+    ["Listed", listedDate],
     ["Brand", item.brand ?? "Not noted by seller"],
     ["Era", item.era ?? "Not noted by seller"],
     [

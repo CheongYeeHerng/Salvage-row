@@ -22,11 +22,12 @@ export default function NotesPage() {
         <p>
           Salvage Row is a seeded secondhand marketplace: a browse view, an item detail view, a
           natural-language search box, and a small Q&amp;A assistant grounded in the catalogue.
-          Almost every listing is a single used item (stock of 1), which is typical of a real
-          secondhand market and deliberately different from a shop that restocks identical units.
-          There are no real accounts, no real payments, and no real shipping — the brief asked
-          for a demo, not a production storefront, so those parts are simulated and labeled as
-          such on the item page.
+          There are 48 listings across two browse pages, sortable by price or how recently they
+          were listed. Almost every listing is a single used item (stock of 1), which is typical
+          of a real secondhand market and deliberately different from a shop that restocks
+          identical units. There are no real accounts, no real payments, and no real shipping —
+          the brief asked for a demo, not a production storefront, so those parts are simulated
+          and labeled as such on the item page.
         </p>
         <p>
           The whole site is browsable without signing in, on purpose — reviewers shouldn&apos;t need
@@ -47,7 +48,7 @@ export default function NotesPage() {
 
       <Section title="Natural-language search">
         <p>
-          The catalogue is small (24 listings), so rather than building a real search index, the
+          The catalogue is small (48 listings), so rather than building a real search index, the
           search API route sends the full catalogue as JSON context to the model alongside the
           shopper&apos;s query, and asks for a ranked list of matching listing IDs with a short reason
           for each. That&apos;s the whole implementation: no embeddings, no vector database, no query
@@ -150,6 +151,12 @@ export default function NotesPage() {
           <li>Search and Q&amp;A prompts are not adversarially hardened against prompt injection via a crafted query.</li>
           <li>Illustrations are simple SVG icons per category, not per-listing photography.</li>
           <li>No offer/negotiation flow — every listing is a fixed, simulated buy-now price.</li>
+          <li>
+            Sorting (by price or recency) only applies to the plain browse view — search results
+            keep the AI's relevance ranking instead, since re-sorting a ranked list by price or
+            date would defeat the point of ranking it by relevance in the first place. The sort
+            control is disabled while a search is active, rather than silently ignored.
+          </li>
           <li>
             The &quot;Report wrong info or a scam&quot; button on each item page submits to a real
             API route, which validates and logs the report server-side — but nothing reads that

@@ -23,7 +23,8 @@ Rules:
   an item to the query based on a null field.
 - Include at most 12 results. If nothing in the catalogue reasonably matches, return {"results":[]}.
 - Judge relevance broadly: category, condition, price range, era/vintage, brand, material,
-  and stated use ("gift", "for a first apartment", "something I can fix up") are all fair signals.`;
+  how recently it was listed (listedAt), and stated use ("gift", "for a first apartment",
+  "something I can fix up") are all fair signals.`;
 
 export async function POST(req: NextRequest) {
   let query = "";
