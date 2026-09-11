@@ -48,7 +48,7 @@ export default function NotesPage() {
       <Section title="Natural-language search">
         <p>
           The catalogue is small (24 listings), so rather than building a real search index, the
-          search API route sends the full catalogue as JSON context to Claude alongside the
+          search API route sends the full catalogue as JSON context to the model alongside the
           shopper&apos;s query, and asks for a ranked list of matching listing IDs with a short reason
           for each. That&apos;s the whole implementation: no embeddings, no vector database, no query
           parser.
@@ -77,7 +77,7 @@ export default function NotesPage() {
       <Section title="Catalogue Q&amp;A">
         <p>
           The Q&amp;A box uses the same &quot;whole catalogue in context&quot; strategy: the question
-          and the full catalogue JSON go to Claude with instructions to answer only from the
+          and the full catalogue JSON go to the model with instructions to answer only from the
           provided data. Several listings have fields deliberately left as <code>null</code> or
           omitted — brand, era, original retail price, and whether an item has been tested/verified
           are all unknown for some items, specifically to check that the assistant says
@@ -95,8 +95,8 @@ export default function NotesPage() {
 
       <Section title="How the AI calls are wired up">
         <p>
-          Both routes call a Claude model from Next.js server routes (<code>app/api/search</code>{" "}
-          and <code>app/api/qa</code>) using a key read from the server environment
+          Both routes call a model from Next.js server routes (<code>app/api/search</code> and{" "}
+          <code>app/api/qa</code>) using a key read from the server environment
           (<code>GATEWAY_API_KEY</code>). The key is never sent to the browser, never appears in
           client bundles, and isn&apos;t committed anywhere in this repository — the deployed
           instance has it set as a hosting-provider environment variable. Reviewers don&apos;t need a
@@ -104,14 +104,31 @@ export default function NotesPage() {
           server-side route.
         </p>
         <p>
-          One detail specific to this environment: requests don&apos;t go to Anthropic&apos;s API
-          directly. They&apos;re deployed behind a class-provided gateway whose direct Claude
-          routes are blocked for student keys, so the app reaches a Claude model through that
-          same gateway&apos;s OpenRouter-compatible endpoint instead, using OpenAI-style chat
-          completions request and response shapes rather than the native Anthropic Messages API
-          format. Functionally it&apos;s the same thing from the app&apos;s point of view — a
-          server-side call to a Claude model, key never exposed to the client — just routed
-          through a different upstream than a direct Anthropic API integration would use.
+          <strong>Which model, and why:</strong> this is worth stating plainly rather than glossing
+          over. This app is deployed behind a class-provided gateway, and getting to a working
+          model took three attempts:
+        </p>
+        <ol className="list-decimal pl-5 space-y-1">
+          <li>Calling Claude directly (the native Anthropic Messages API shape) — the gateway
+            blocks that route entirely for student keys and returns 403.</li>
+          <li>Calling Claude through the gateway&apos;s OpenRouter-compatible endpoint
+            (<code>anthropic/claude-3.5-sonnet</code>) — reachable, but rejected with a
+            &quot;no price is published for this model&quot; error, meaning that model isn&apos;t
+            enabled for billing on this gateway account.</li>
+          <li>Calling the gateway&apos;s own OpenAI-compatible Chat Completions endpoint with{" "}
+            <code>gpt-5.6-terra</code> — this is what&apos;s actually wired up and working. The
+            request/response shapes are OpenAI-style (a <code>messages</code> array in, a{" "}
+            <code>choices[0].message.content</code> string out) rather than Claude&apos;s native
+            format, but the app-level contract — send the catalogue and a question, get back a
+            grounded answer — is unaffected by which model answers it.</li>
+        </ol>
+        <p>
+          So: the search and Q&amp;A features are genuinely model-powered and genuinely live, just
+          not specifically Claude in this deployment — that was a gateway/billing constraint on
+          the account, not a design choice. Pointing <code>GATEWAY_MODEL</code> and{" "}
+          <code>GATEWAY_BASE_URL</code> at a different endpoint (a real Anthropic key, a different
+          gateway) would work with no other code changes, since <code>lib/model.ts</code> is the
+          only place either value is read.
         </p>
       </Section>
 

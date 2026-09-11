@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getItem } from "@/data/catalogue";
-import { callClaude, parseJsonLoose } from "@/lib/anthropic";
+import { callModel, parseJsonLoose } from "@/lib/model";
 import { catalogueContext, keywordFallbackSearch } from "@/lib/search";
 
 export const runtime = "nodejs";
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ results: [], mode: "empty" });
   }
 
-  const result = await callClaude({
+  const result = await callModel({
     system: SYSTEM_PROMPT,
     user: `Catalogue:\n${catalogueContext()}\n\nQuery: ${query}`,
     maxTokens: 1024,

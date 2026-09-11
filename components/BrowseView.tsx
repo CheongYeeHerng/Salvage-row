@@ -41,7 +41,7 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
       setSearchedFor(trimmed);
       if (data.mode === "fallback") {
         setNote(
-          "Showing keyword matches — the natural-language model didn't return a usable result for this query."
+          `Showing keyword matches — ${data.note ?? "the natural-language model didn't return a usable result for this query."}`
         );
       }
     } catch {

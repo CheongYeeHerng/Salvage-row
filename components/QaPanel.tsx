@@ -6,6 +6,7 @@ interface Turn {
   question: string;
   answer: string;
   mode?: string;
+  error?: string;
 }
 
 const SUGGESTIONS = [
@@ -32,7 +33,10 @@ export default function QaPanel() {
         body: JSON.stringify({ question: trimmed }),
       });
       const data = await res.json();
-      setTurns((t) => [...t, { question: trimmed, answer: data.answer, mode: data.mode }]);
+      setTurns((t) => [
+        ...t,
+        { question: trimmed, answer: data.answer, mode: data.mode, error: data.error },
+      ]);
     } catch {
       setTurns((t) => [
         ...t,
@@ -77,6 +81,11 @@ export default function QaPanel() {
               {t.mode === "unavailable" && (
                 <p className="text-xs text-rust-dark mt-1">
                   Simulated feature unavailable in this environment.
+                </p>
+              )}
+              {t.error && (
+                <p className="text-xs text-rust-dark mt-1 font-mono whitespace-pre-wrap break-words">
+                  {t.error}
                 </p>
               )}
             </li>

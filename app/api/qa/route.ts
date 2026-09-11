@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { callClaude } from "@/lib/anthropic";
+import { callModel } from "@/lib/model";
 import { catalogueContext } from "@/lib/search";
 
 export const runtime = "nodejs";
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A question is required." }, { status: 400 });
   }
 
-  const result = await callClaude({
+  const result = await callModel({
     system: SYSTEM_PROMPT,
     user: `Catalogue:\n${catalogueContext()}\n\nQuestion: ${question}`,
     maxTokens: 600,
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     mode: "unavailable",
     answer:
       "Catalogue Q&A isn't available right now — the model call didn't return a response. " +
-      "This feature depends on a server-side ANTHROPIC_API_KEY being configured; see /notes for details.",
+      "This feature depends on a server-side GATEWAY_API_KEY being configured; see /notes for details.",
     error: result.error,
   });
 }
