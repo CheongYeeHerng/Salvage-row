@@ -4,7 +4,7 @@ const STYLES: Record<Condition, string> = {
   "Like new": "bg-[#2F6B46] text-paper",
   Good: "bg-denim text-paper",
   Fair: "bg-[#8C5A1E] text-paper",
-  "Well-worn": "bg-rust-dark text-paper",
+  "Well-worn": "bg-[#8B2A2A] text-paper",
 };
 
 export default function ConditionTag({ condition }: { condition: Condition }) {
