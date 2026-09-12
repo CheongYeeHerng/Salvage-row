@@ -7,6 +7,7 @@ interface Turn {
   answer: string;
   mode?: string;
   error?: string;
+  followUpQuestions?: string[];
 }
 
 const SUGGESTIONS = [
@@ -37,7 +38,13 @@ export default function QaPanel() {
       const data = await res.json();
       setTurns((t) => [
         ...t,
-        { question: trimmed, answer: data.answer, mode: data.mode, error: data.error },
+        {
+          question: trimmed,
+          answer: data.answer,
+          mode: data.mode,
+          error: data.error,
+          followUpQuestions: data.followUpQuestions,
+        },
       ]);
       setViewIndex(newIndex);
     } catch {
@@ -114,6 +121,22 @@ export default function QaPanel() {
               <p className="text-xs text-rust-dark mt-1 font-mono whitespace-pre-wrap break-words">
                 {current.error}
               </p>
+            )}
+            {!!current.followUpQuestions?.length && viewIndex === turns.length - 1 && (
+              <div className="mt-3 pt-3 border-t border-dust-line">
+                <p className="text-xs text-dust mb-2">Ask a follow-up</p>
+                <div className="flex flex-wrap gap-2">
+                  {current.followUpQuestions.map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => ask(q)}
+                      className="text-xs px-3 py-1 border border-dust-line hover:bg-paper-dim transition-colors text-left"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -21,7 +21,8 @@ export default function NotesPage() {
         <p>
           Salvage Row is a seeded secondhand marketplace demo: a browse view across 48 listings
           (two pages, sortable by price or how recently something was listed), an item detail
-          view, a natural-language search box, a catalogue-grounded Q&amp;A assistant, and a
+          view, a natural-language search box, a catalogue-grounded Q&amp;A assistant (which also
+          suggests a few grounded follow-up questions after each answer), and a
           &quot;report this listing&quot; flow. It's built for a reviewer evaluating the demo —
           everything is reachable with no account, no sign-in, and no setup beyond opening the
           URL. In terms of the product itself, it's aimed at people who want to buy vintage or
@@ -155,6 +156,10 @@ export default function NotesPage() {
             The model behind Search and Q&amp;A is tied to what this specific class gateway
             currently permits (see section 3) — if the gateway&apos;s configuration changes,{" "}
             <code>GATEWAY_MODEL</code> may need updating.
+          </li>
+          <li>
+            Follow-up question suggestions depend on the model returning well-formed JSON; if it
+            doesn't, the answer still displays normally, it just won't have follow-ups that turn.
           </li>
         </ul>
       </Section>

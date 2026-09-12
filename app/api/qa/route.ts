@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { callModel } from "@/lib/model";
+import { callModel, parseJsonLoose } from "@/lib/model";
 import { catalogueContext } from "@/lib/search";
 
 export const runtime = "nodejs";
@@ -19,7 +19,18 @@ shown to any visitor via the "Contact seller" button on the item page.
 
 When comparing items, be specific: name the items and the differing attribute values.
 Keep answers conversational and under ~120 words unless the comparison genuinely needs more.
-Do not use markdown headers. Plain prose and short lists are fine.`;
+Do not use markdown headers. Plain prose and short lists are fine within the answer text.
+
+Return ONLY a JSON object, no prose outside it, no markdown fences, shaped exactly like:
+{"answer":"your answer text here","followUpQuestions":["question one","question two"]}
+
+Rules for followUpQuestions:
+- 2 to 4 short, natural questions a shopper might reasonably ask next, grounded in this
+  catalogue's actual items and fields — not generic questions that could apply to any shop.
+- Build on what was just asked: a narrower comparison, an adjacent item, a related missing-fact
+  check, or a natural next step ("how do I contact the seller of X").
+- Phrase each as something the shopper would type, not a description of a topic.
+- If nothing sensible follows from this answer, return an empty array.`;
 
 export async function POST(req: NextRequest) {
   let question = "";
@@ -37,7 +48,7 @@ export async function POST(req: NextRequest) {
   const result = await callModel({
     system: SYSTEM_PROMPT,
     user: `Catalogue:\n${catalogueContext()}\n\nQuestion: ${question}`,
-    maxTokens: 600,
+    maxTokens: 700,
   });
 
   if (!result.ok && result.error) {
@@ -45,7 +56,22 @@ export async function POST(req: NextRequest) {
   }
 
   if (result.ok && result.text) {
-    return NextResponse.json({ mode: "ai", answer: result.text });
+    interface QaModelResponse {
+      answer: string;
+      followUpQuestions?: string[];
+    }
+    const parsed = parseJsonLoose<QaModelResponse>(result.text);
+
+    if (parsed && typeof parsed.answer === "string" && parsed.answer.trim()) {
+      const followUpQuestions = Array.isArray(parsed.followUpQuestions)
+        ? parsed.followUpQuestions.filter((q): q is string => typeof q === "string").slice(0, 4)
+        : [];
+      return NextResponse.json({ mode: "ai", answer: parsed.answer, followUpQuestions });
+    }
+
+    // Model responded but not in the expected JSON shape — still show the raw
+    // text as the answer rather than discarding a perfectly good response.
+    return NextResponse.json({ mode: "ai", answer: result.text, followUpQuestions: [] });
   }
 
   return NextResponse.json({
