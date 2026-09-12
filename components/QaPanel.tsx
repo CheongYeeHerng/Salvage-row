@@ -1,6 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+
+interface ReferencedItem {
+  id: string;
+  name: string;
+}
 
 interface Turn {
   question: string;
@@ -8,6 +14,7 @@ interface Turn {
   mode?: string;
   error?: string;
   followUpQuestions?: string[];
+  referencedItems?: ReferencedItem[];
 }
 
 const SUGGESTIONS = [
@@ -44,6 +51,7 @@ export default function QaPanel() {
           mode: data.mode,
           error: data.error,
           followUpQuestions: data.followUpQuestions,
+          referencedItems: data.referencedItems,
         },
       ]);
       setViewIndex(newIndex);
@@ -112,6 +120,19 @@ export default function QaPanel() {
           <div className="border-t border-dust-line pt-3">
             <p className="font-medium">{current.question}</p>
             <p className="text-sm mt-1 whitespace-pre-wrap">{current.answer}</p>
+            {!!current.referencedItems?.length && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {current.referencedItems.map((ref) => (
+                  <Link
+                    key={ref.id}
+                    href={`/item/${ref.id}`}
+                    className="text-xs px-2 py-1 border border-dust-line bg-paper hover:bg-paper-dim hover:text-rust transition-colors"
+                  >
+                    {ref.name} →
+                  </Link>
+                ))}
+              </div>
+            )}
             {current.mode === "unavailable" && (
               <p className="text-xs text-rust-dark mt-1">
                 Simulated feature unavailable in this environment.

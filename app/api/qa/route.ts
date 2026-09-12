@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { callModel, parseJsonLoose } from "@/lib/model";
 import { catalogueContext } from "@/lib/search";
+import { getItem } from "@/data/catalogue";
 
 export const runtime = "nodejs";
 
@@ -22,7 +23,13 @@ Keep answers conversational and under ~120 words unless the comparison genuinely
 Do not use markdown headers. Plain prose and short lists are fine within the answer text.
 
 Return ONLY a JSON object, no prose outside it, no markdown fences, shaped exactly like:
-{"answer":"your answer text here","followUpQuestions":["question one","question two"]}
+{"answer":"your answer text here","referencedItemIds":["014","009"],"followUpQuestions":["question one","question two"]}
+
+Rules for referencedItemIds:
+- List the "id" of every catalogue item your answer actually names or relies on, in the order
+  they're first mentioned. Only use ids that appear in the catalogue provided.
+- If the answer doesn't reference any specific item (a general question with no items named),
+  return an empty array.
 
 Rules for followUpQuestions:
 - 2 to 4 short, natural questions a shopper might reasonably ask next, grounded in this
@@ -58,6 +65,7 @@ export async function POST(req: NextRequest) {
   if (result.ok && result.text) {
     interface QaModelResponse {
       answer: string;
+      referencedItemIds?: string[];
       followUpQuestions?: string[];
     }
     const parsed = parseJsonLoose<QaModelResponse>(result.text);
@@ -66,12 +74,21 @@ export async function POST(req: NextRequest) {
       const followUpQuestions = Array.isArray(parsed.followUpQuestions)
         ? parsed.followUpQuestions.filter((q): q is string => typeof q === "string").slice(0, 4)
         : [];
-      return NextResponse.json({ mode: "ai", answer: parsed.answer, followUpQuestions });
+
+      const referencedItems = Array.isArray(parsed.referencedItemIds)
+        ? parsed.referencedItemIds
+            .filter((id): id is string => typeof id === "string")
+            .map((id) => getItem(id))
+            .filter((item): item is NonNullable<typeof item> => item !== undefined)
+            .map((item) => ({ id: item.id, name: item.name }))
+        : [];
+
+      return NextResponse.json({ mode: "ai", answer: parsed.answer, followUpQuestions, referencedItems });
     }
 
     // Model responded but not in the expected JSON shape — still show the raw
     // text as the answer rather than discarding a perfectly good response.
-    return NextResponse.json({ mode: "ai", answer: result.text, followUpQuestions: [] });
+    return NextResponse.json({ mode: "ai", answer: result.text, followUpQuestions: [], referencedItems: [] });
   }
 
   return NextResponse.json({
