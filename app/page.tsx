@@ -19,7 +19,7 @@ export default function HomePage() {
 
       <BrowseView initial={catalogue} />
 
-      <div className="mt-12">
+      <div className="mt-12" id="qa">
         <QaPanel />
       </div>
     </div>

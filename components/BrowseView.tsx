@@ -72,6 +72,11 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
     setResults(initial.map((item) => ({ item, reason: null })));
   }
 
+  function clearAll() {
+    clearSearch();
+    setActiveCategory(null);
+  }
+
   const filtered = useMemo(() => {
     if (!activeCategory) return results;
     return results.filter((r) => r.item.category === activeCategory);
@@ -192,9 +197,17 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
       )}
 
       {visible.length === 0 ? (
-        <p className="text-dust italic">
-          Nothing matched. Try a broader description, or clear the search to browse everything.
-        </p>
+        <div>
+          <p className="text-dust italic mb-3">
+            Nothing matched. Try a broader description, or clear the search to browse everything.
+          </p>
+          <button
+            onClick={clearAll}
+            className="px-4 py-2 border border-dust-line hover:bg-paper-dim transition-colors text-sm"
+          >
+            Clear search
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {visible.map(({ item, reason }) => (

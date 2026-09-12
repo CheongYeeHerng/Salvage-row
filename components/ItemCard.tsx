@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Item } from "@/data/catalogue";
 import ItemIllustration from "./ItemIllustration";
+import ConditionTag from "./ConditionTag";
 
 export default function ItemCard({ item, reason }: { item: Item; reason?: string | null }) {
   return (
@@ -17,10 +18,10 @@ export default function ItemCard({ item, reason }: { item: Item; reason?: string
         <h3 className="font-display text-lg leading-snug mt-1 group-hover:text-rust transition-colors">
           {item.name}
         </h3>
-        <p className="text-sm text-ink/60">
-          {item.condition}
-          {item.era ? ` · ${item.era}` : ""}
-        </p>
+        <div className="flex items-center gap-2 mt-1">
+          <ConditionTag condition={item.condition} />
+          {item.era && <span className="text-xs text-ink/50">{item.era}</span>}
+        </div>
         <div className="flex items-center justify-between mt-2">
           <span className="text-base">${item.price}</span>
           {item.stock > 1 && <span className="text-xs text-dust">{item.stock} available</span>}

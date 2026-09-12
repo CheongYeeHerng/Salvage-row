@@ -11,6 +11,9 @@ export default function Header() {
           <Link href="/" className="hover:text-rust transition-colors">
             Browse
           </Link>
+          <Link href="/#qa" className="hover:text-rust transition-colors">
+            Catalogue Q&amp;A
+          </Link>
           <Link href="/notes" className="hover:text-rust transition-colors">
             Notes
           </Link>

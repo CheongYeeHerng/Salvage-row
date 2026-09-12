@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { catalogue, getItem } from "@/data/catalogue";
 import ItemIllustration from "@/components/ItemIllustration";
+import ConditionTag from "@/components/ConditionTag";
 import SimulatedPurchase from "@/components/SimulatedPurchase";
 import ReportButton from "@/components/ReportButton";
 
@@ -22,7 +23,6 @@ export default function ItemPage({ params }: { params: { id: string } }) {
   const facts: [string, string][] = [
     ["Price", `$${item.price}`],
     ["Category", item.category],
-    ["Condition", item.condition],
     ["Listed", listedDate],
     ["Brand", item.brand ?? "Not noted by seller"],
     ["Era", item.era ?? "Not noted by seller"],
@@ -53,8 +53,8 @@ export default function ItemPage({ params }: { params: { id: string } }) {
           <span className="text-xs text-dust">Lot {item.id}</span>
           <h1 className="font-display text-3xl mt-1">{item.name}</h1>
           <p className="text-ink/60">
-            {item.condition}
-            {item.era ? ` · ${item.era}` : ""}
+            <ConditionTag condition={item.condition} />
+            {item.era ? <span className="ml-2">{item.era}</span> : null}
           </p>
 
           <p className="mt-4 text-ink/80">{item.description}</p>
