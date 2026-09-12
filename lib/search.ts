@@ -1,4 +1,5 @@
 import { catalogue, Item } from "@/data/catalogue";
+import { getSellerContact } from "@/data/sellers";
 
 /** A compact JSON representation of the catalogue, small enough to pass in full as prompt context. */
 export function catalogueContext(): string {
@@ -15,6 +16,7 @@ export function catalogueContext(): string {
     material: p.material ?? null,
     stock: p.stock,
     seller: p.seller,
+    sellerContact: getSellerContact(p.seller) ?? null,
     listedAt: p.listedAt,
     description: p.description,
   }));

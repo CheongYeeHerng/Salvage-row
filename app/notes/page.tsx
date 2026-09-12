@@ -61,7 +61,10 @@ export default function NotesPage() {
           </li>
           <li>
             &quot;Contact seller&quot; on the item page shows a phone number and email — both are
-            made up for the demo, not real contact details for anyone.
+            made up for the demo, not real contact details for anyone. The Q&amp;A assistant can
+            also read and share these on request, since they're already shown publicly to any
+            visitor via that button — nothing is exposed to the AI that a person browsing
+            couldn't already see.
           </li>
           <li>There are no user accounts or authentication anywhere — the whole site is public by design.</li>
         </ul>

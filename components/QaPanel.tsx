@@ -13,12 +13,13 @@ const SUGGESTIONS = [
   "Which electronics have been tested and confirmed working?",
   "Compare the Trek bike and the skateboard for getting around town.",
   "What's the cheapest way to furnish a first apartment here?",
-  "Where does the Polaroid camera come from, and has it been tested?",
+  "How can I contact the seller of the Danish Teak Sideboard?",
 ];
 
 export default function QaPanel() {
   const [question, setQuestion] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
+  const [viewIndex, setViewIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
 
   async function ask(q: string) {
@@ -26,6 +27,7 @@ export default function QaPanel() {
     if (!trimmed || loading) return;
     setLoading(true);
     setQuestion("");
+    const newIndex = turns.length;
     try {
       const res = await fetch("/api/qa", {
         method: "POST",
@@ -37,6 +39,7 @@ export default function QaPanel() {
         ...t,
         { question: trimmed, answer: data.answer, mode: data.mode, error: data.error },
       ]);
+      setViewIndex(newIndex);
     } catch {
       setTurns((t) => [
         ...t,
@@ -46,10 +49,13 @@ export default function QaPanel() {
           mode: "error",
         },
       ]);
+      setViewIndex(newIndex);
     } finally {
       setLoading(false);
     }
   }
+
+  const current = viewIndex >= 0 ? turns[viewIndex] : null;
 
   return (
     <section className="border border-dust-line bg-paper-dim/40 p-4 sm:p-6">
@@ -72,25 +78,45 @@ export default function QaPanel() {
         </div>
       )}
 
-      {turns.length > 0 && (
-        <ol className="space-y-4 mb-4">
-          {turns.map((t, i) => (
-            <li key={i} className="border-t border-dust-line pt-3 first:border-t-0 first:pt-0">
-              <p className="font-medium">{t.question}</p>
-              <p className="text-sm mt-1 whitespace-pre-wrap">{t.answer}</p>
-              {t.mode === "unavailable" && (
-                <p className="text-xs text-rust-dark mt-1">
-                  Simulated feature unavailable in this environment.
-                </p>
-              )}
-              {t.error && (
-                <p className="text-xs text-rust-dark mt-1 font-mono whitespace-pre-wrap break-words">
-                  {t.error}
-                </p>
-              )}
-            </li>
-          ))}
-        </ol>
+      {current && (
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <button
+              onClick={() => setViewIndex((i) => Math.max(0, i - 1))}
+              disabled={viewIndex === 0}
+              aria-label="Previous question"
+              className="px-2 py-1 border border-dust-line hover:bg-paper-dim transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              ←
+            </button>
+            <span className="text-xs text-dust">
+              Question {viewIndex + 1} of {turns.length}
+            </span>
+            <button
+              onClick={() => setViewIndex((i) => Math.min(turns.length - 1, i + 1))}
+              disabled={viewIndex === turns.length - 1}
+              aria-label="Next question"
+              className="px-2 py-1 border border-dust-line hover:bg-paper-dim transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              →
+            </button>
+          </div>
+
+          <div className="border-t border-dust-line pt-3">
+            <p className="font-medium">{current.question}</p>
+            <p className="text-sm mt-1 whitespace-pre-wrap">{current.answer}</p>
+            {current.mode === "unavailable" && (
+              <p className="text-xs text-rust-dark mt-1">
+                Simulated feature unavailable in this environment.
+              </p>
+            )}
+            {current.error && (
+              <p className="text-xs text-rust-dark mt-1 font-mono whitespace-pre-wrap break-words">
+                {current.error}
+              </p>
+            )}
+          </div>
+        </div>
       )}
 
       <form
