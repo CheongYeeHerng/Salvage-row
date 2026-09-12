@@ -6,7 +6,7 @@ export default function SimulatedPurchase({ name, price }: { name: string; price
   const [status, setStatus] = useState<"idle" | "done">("idle");
 
   return (
-    <div className="mt-4">
+    <div>
       {status === "idle" ? (
         <button
           onClick={() => setStatus("done")}

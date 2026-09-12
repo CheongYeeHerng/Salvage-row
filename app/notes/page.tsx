@@ -24,7 +24,9 @@ export default function NotesPage() {
           view, a natural-language search box, a catalogue-grounded Q&amp;A assistant, and a
           &quot;report this listing&quot; flow. It's built for a reviewer evaluating the demo —
           everything is reachable with no account, no sign-in, and no setup beyond opening the
-          URL.
+          URL. In terms of the product itself, it's aimed at people who want to buy vintage or
+          used items secondhand — browsing by category, condition, and price rather than
+          shopping for something new.
         </p>
         <p>
           Search and Q&amp;A both work the same way under the hood: the small catalogue (48
@@ -56,6 +58,10 @@ export default function NotesPage() {
             Listing reports (wrong info / suspected scam) submit to a real, validated server
             route that logs the report — but nothing reviews that log. There's no moderation
             queue or seller-action workflow behind it.
+          </li>
+          <li>
+            &quot;Contact seller&quot; on the item page shows a phone number and email — both are
+            made up for the demo, not real contact details for anyone.
           </li>
           <li>There are no user accounts or authentication anywhere — the whole site is public by design.</li>
         </ul>

@@ -3,7 +3,7 @@ import { Condition } from "@/data/catalogue";
 const STYLES: Record<Condition, string> = {
   "Like new": "bg-[#DCEAE0] text-[#2F5D3A]",
   Good: "bg-[#DCE4EC] text-[#2C4A63]",
-  Fair: "bg-[#F1E1BE] text-[#8C5A1E]",
+  Fair: "bg-[#D9A441] text-[#3F2A05]",
   "Well-worn": "bg-[#EDD6D2] text-[#7E4324]",
 };
 

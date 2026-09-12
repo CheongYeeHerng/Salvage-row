@@ -5,6 +5,7 @@ import ItemIllustration from "@/components/ItemIllustration";
 import ConditionTag from "@/components/ConditionTag";
 import SimulatedPurchase from "@/components/SimulatedPurchase";
 import ReportButton from "@/components/ReportButton";
+import ContactSellerButton from "@/components/ContactSellerButton";
 
 export function generateStaticParams() {
   return catalogue.map((p) => ({ id: p.id }));
@@ -68,7 +69,10 @@ export default function ItemPage({ params }: { params: { id: string } }) {
             ))}
           </dl>
 
-          <SimulatedPurchase name={item.name} price={item.price} />
+          <div className="mt-4 flex flex-wrap items-start gap-3">
+            <SimulatedPurchase name={item.name} price={item.price} />
+            <ContactSellerButton seller={item.seller} />
+          </div>
 
           <div className="mt-4">
             <ReportButton itemId={item.id} />
