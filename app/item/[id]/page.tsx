@@ -6,6 +6,8 @@ import ConditionTag from "@/components/ConditionTag";
 import SimulatedPurchase from "@/components/SimulatedPurchase";
 import ReportButton from "@/components/ReportButton";
 import ContactSellerButton from "@/components/ContactSellerButton";
+import StarRating from "@/components/StarRating";
+import { getSellerByName, averageRating } from "@/data/sellers";
 
 export function generateStaticParams() {
   return catalogue.map((p) => ({ id: p.id }));
@@ -37,9 +39,11 @@ export default function ItemPage({ params }: { params: { id: string } }) {
     ],
     ["Original retail price", item.originalPrice ? `$${item.originalPrice}` : "Unknown"],
     ["Material", item.material ?? "Not noted by seller"],
-    ["Sold by", item.seller],
     ["Quantity", `${item.stock} available`],
   ];
+
+  const sellerProfile = getSellerByName(item.seller);
+  const sellerRating = sellerProfile ? averageRating(sellerProfile.reviews) : null;
 
   return (
     <div>
@@ -68,6 +72,25 @@ export default function ItemPage({ params }: { params: { id: string } }) {
               </div>
             ))}
           </dl>
+
+          <div className="mt-4">
+            <p className="text-xs text-dust mb-1">Sold by</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {sellerProfile ? (
+                <Link
+                  href={`/seller/${sellerProfile.slug}`}
+                  className="font-medium hover:text-rust transition-colors"
+                >
+                  {item.seller}
+                </Link>
+              ) : (
+                <span className="font-medium">{item.seller}</span>
+              )}
+              {sellerProfile && sellerRating !== null && (
+                <StarRating rating={sellerRating} reviewCount={sellerProfile.reviews.length} />
+              )}
+            </div>
+          </div>
 
           <div className="mt-4 flex flex-wrap items-start gap-3">
             <SimulatedPurchase name={item.name} price={item.price} />

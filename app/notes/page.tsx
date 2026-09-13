@@ -23,8 +23,8 @@ export default function NotesPage() {
           (two pages, sortable by price or how recently something was listed), an item detail
           view, a natural-language search box, a catalogue-grounded Q&amp;A assistant (which links
           to any items it references and suggests a few grounded follow-up questions after each
-          answer), and a &quot;report this listing&quot; flow. It's built for a reviewer
-          evaluating the demo —
+          answer), seller ratings and review pages, and a &quot;report this listing&quot; flow.
+          It's built for a reviewer evaluating the demo —
           everything is reachable with no account, no sign-in, and no setup beyond opening the
           URL. In terms of the product itself, it's aimed at people who want to buy vintage or
           used items secondhand — browsing by category, condition, and price rather than
@@ -67,6 +67,13 @@ export default function NotesPage() {
             also read and share these on request, since they're already shown publicly to any
             visitor via that button — nothing is exposed to the AI that a person browsing
             couldn't already see.
+          </li>
+          <li>
+            Each seller has a star rating and a page of reviews, reached by clicking the seller's
+            name on an item page. The rating is computed live as the average of that seller's
+            seeded reviews rather than stored as a separate number, so it can't drift out of sync
+            with the reviews shown — but the reviews themselves are all invented for the demo,
+            not real feedback from real sales.
           </li>
           <li>There are no user accounts or authentication anywhere — the whole site is public by design.</li>
         </ul>
