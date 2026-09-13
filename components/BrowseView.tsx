@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Category, Item, categories as allCategories } from "@/data/catalogue";
 import ItemCard from "./ItemCard";
+import ConditionLegend from "./ConditionLegend";
 
 interface SearchResultItem {
   item: Item;
@@ -140,6 +141,8 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
           )}
         </div>
       </form>
+
+      <ConditionLegend />
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex flex-wrap gap-2">
