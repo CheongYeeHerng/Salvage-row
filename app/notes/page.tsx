@@ -24,11 +24,9 @@ export default function NotesPage() {
           view, a natural-language search box, a catalogue-grounded Q&amp;A assistant (which links
           to any items it references and suggests a few grounded follow-up questions after each
           answer), seller ratings and review pages, and a &quot;report this listing&quot; flow.
-          It's built for a reviewer evaluating the demo —
-          everything is reachable with no account, no sign-in, and no setup beyond opening the
-          URL. In terms of the product itself, it's aimed at people who want to buy vintage or
-          used items secondhand — browsing by category, condition, and price rather than
-          shopping for something new.
+          It's aimed at people who want to buy vintage or used items secondhand — browsing by
+          category, condition, and price rather than shopping for something new. Everything is
+          reachable with no account, no sign-in, and no setup beyond opening the URL.
         </p>
         <p>
           Search and Q&amp;A both work the same way under the hood: the small catalogue (48
