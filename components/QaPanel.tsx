@@ -20,7 +20,7 @@ interface Turn {
 const SUGGESTIONS = [
   "Which electronics have been tested and confirmed working?",
   "Compare the Trek bike and the skateboard for getting around town.",
-  "What's the cheapest way to furnish a first apartment here?",
+  "Which seller has the best average rating?",
   "How can I contact the seller of the Danish Teak Sideboard?",
 ];
 

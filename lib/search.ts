@@ -1,5 +1,5 @@
 import { catalogue, Item } from "@/data/catalogue";
-import { getSellerContact } from "@/data/sellers";
+import { getSellerContact, getSellerByName, averageRating } from "@/data/sellers";
 
 /** A compact JSON representation of the catalogue, small enough to pass in full as prompt context. */
 export function catalogueContext(): string {
@@ -17,6 +17,12 @@ export function catalogueContext(): string {
     stock: p.stock,
     seller: p.seller,
     sellerContact: getSellerContact(p.seller) ?? null,
+    sellerRating: (() => {
+      const profile = getSellerByName(p.seller);
+      return profile
+        ? { average: Math.round(averageRating(profile.reviews) * 10) / 10, reviewCount: profile.reviews.length }
+        : null;
+    })(),
     listedAt: p.listedAt,
     description: p.description,
   }));

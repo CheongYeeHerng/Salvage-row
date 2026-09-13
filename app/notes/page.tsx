@@ -73,7 +73,9 @@ export default function NotesPage() {
             name on an item page. The rating is computed live as the average of that seller's
             seeded reviews rather than stored as a separate number, so it can't drift out of sync
             with the reviews shown — but the reviews themselves are all invented for the demo,
-            not real feedback from real sales.
+            not real feedback from real sales. The Q&amp;A assistant can see each seller's
+            aggregate rating and review count (not the individual review text) and will use it
+            when asked about reputation or trustworthiness.
           </li>
           <li>There are no user accounts or authentication anywhere — the whole site is public by design.</li>
         </ul>
