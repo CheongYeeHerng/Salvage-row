@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Category, Item, categories as allCategories } from "@/data/catalogue";
 import ItemCard from "./ItemCard";
 import ConditionLegend from "./ConditionLegend";
@@ -26,6 +26,12 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [sort, setSort] = useState<SortOption>("recent-desc");
   const [page, setPage] = useState(1);
+  const listingTopRef = useRef<HTMLDivElement>(null);
+
+  function goToPage(n: number) {
+    setPage(n);
+    listingTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
   const [results, setResults] = useState<SearchResultItem[]>(
     initial.map((item) => ({ item, reason: null }))
   );
@@ -179,6 +185,8 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
 
       <ConditionLegend />
 
+      <div ref={listingTopRef} />
+
       <p className="text-sm text-dust mb-4">
         {searchedFor ? (
           <>
@@ -222,7 +230,7 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-4 mt-8">
           <button
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => goToPage(Math.max(1, page - 1))}
             disabled={page === 1}
             className="px-4 py-2 border border-dust-line hover:bg-paper-dim transition-colors disabled:opacity-40 disabled:hover:bg-transparent"
           >
@@ -232,7 +240,7 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
               <button
                 key={n}
-                onClick={() => setPage(n)}
+                onClick={() => goToPage(n)}
                 aria-current={page === n ? "page" : undefined}
                 className={`w-8 h-8 text-sm border transition-colors ${
                   page === n ? "bg-rust text-paper border-rust" : "border-dust-line hover:bg-paper-dim"
@@ -243,7 +251,7 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
             ))}
           </div>
           <button
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() => goToPage(Math.min(totalPages, page + 1))}
             disabled={page === totalPages}
             className="px-4 py-2 border border-dust-line hover:bg-paper-dim transition-colors disabled:opacity-40 disabled:hover:bg-transparent"
           >
