@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bitter, Inter } from "next/font/google";
+import { Bitter, Inter, Alfa_Slab_One } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 
@@ -16,6 +16,12 @@ const body = Inter({
   variable: "--font-body",
 });
 
+const brand = Alfa_Slab_One({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-brand",
+});
+
 export const metadata: Metadata = {
   title: "Salvage Row — a secondhand marketplace",
   description:
@@ -24,7 +30,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${brand.variable}`}>
       <body className="min-h-screen bg-paper text-ink">
         <Header />
         <main className="max-w-content mx-auto px-4 sm:px-6 py-8">{children}</main>

@@ -21,6 +21,7 @@ const config: Config = {
       fontFamily: {
         display: ["var(--font-display)", "serif"],
         body: ["var(--font-body)", "sans-serif"],
+        brand: ["var(--font-brand)", "serif"],
       },
       maxWidth: {
         content: "72rem",

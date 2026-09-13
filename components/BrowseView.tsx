@@ -142,8 +142,6 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
         </div>
       </form>
 
-      <ConditionLegend />
-
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div className="flex flex-wrap gap-2">
           {allCategories.map((c) => (
@@ -178,6 +176,8 @@ export default function BrowseView({ initial }: { initial: Item[] }) {
           </select>
         </label>
       </div>
+
+      <ConditionLegend />
 
       <p className="text-sm text-dust mb-4">
         {searchedFor ? (
